@@ -177,6 +177,8 @@ If you don't have a Slack app yet, follow these steps:
 
 1. Go to [api.slack.com/apps](https://api.slack.com/apps)
 2. Click **Create New App**
+3. Choose **From a manifest** (recommended) and paste the contents of `manifest.json` from this repo, then skip to step 5
+4. Or choose **From scratch** to configure manually (continue with steps below)
 3. Choose **From scratch**
 4. Enter an app name (e.g., "RelayBot") and select your workspace
 5. Click **Create App**
