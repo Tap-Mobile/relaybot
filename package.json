@@ -1,7 +1,7 @@
 {
   "name": "relaybot",
   "version": "1.0.2",
-  "description": "A Slack-to-AI gateway that lets you interact with Claude/Codex directly from your DMs",
+  "description": "An AI assistant that lives in your Slack DMs — powered by Claude or Codex",
   "main": "main.js",
   "bin": {
     "relaybot": "./cli.js"

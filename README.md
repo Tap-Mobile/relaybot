@@ -1,6 +1,6 @@
 # RelayBot
 
-A Slack-to-AI gateway that lets you interact with Claude/Codex directly from your DMs.
+An AI assistant that lives in your Slack DMs — powered by Claude or Codex.
 
 <img src="demo/demo.jpg" width="30%">
 
