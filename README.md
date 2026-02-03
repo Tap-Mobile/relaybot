@@ -107,8 +107,11 @@ Then run:
 # Configure Slack credentials
 relaybot setup
 
-# Start the bot
+# Start the bot (Claude by default)
 relaybot start
+
+# Start the bot with Codex
+relaybot start --codex
 ```
 
 ### Option 2: Run from Source
@@ -124,8 +127,11 @@ npm install
 # Configure Slack credentials
 npm run setup
 
-# Start the bot
+# Start the bot (Claude by default)
 npm start
+
+# Start the bot with Codex
+node main.js --codex
 ```
 
 ---

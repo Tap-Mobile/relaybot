@@ -12,7 +12,8 @@ const web = new WebClient(config.SLACK_BOT_TOKEN);
 const userId = config.SLACK_USER_ID;
 
 // Get the message from command line arguments
-const message = process.argv[2];
+// Convert literal \n to actual newlines
+const message = process.argv[2]?.replace(/\\n/g, '\n');
 
 if (!message) {
     console.error('Please provide a message to send.');
