@@ -10,7 +10,7 @@ const config = loadConfig();
 if (!config || !config.SLACK_BOT_TOKEN || !config.SLACK_APP_TOKEN || !config.SLACK_USER_ID) {
   console.error('❌ Configuration not found or incomplete.\n');
   console.log('Please run setup first:\n');
-  console.log('  node setup.js\n');
+  console.log('  relaybot setup\n');
   process.exit(1);
 }
 

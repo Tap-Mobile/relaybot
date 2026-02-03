@@ -4,8 +4,7 @@
   "description": "A Slack-to-AI gateway that lets you interact with Claude/Codex directly from your DMs",
   "main": "main.js",
   "bin": {
-    "relaybot": "./main.js",
-    "relaybot-setup": "./setup.js"
+    "relaybot": "./cli.js"
   },
   "scripts": {
     "start": "node main.js",
