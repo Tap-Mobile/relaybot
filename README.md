@@ -2,7 +2,7 @@
 
 A Slack-to-AI gateway that lets you interact with Claude/Codex directly from your DMs.
 
-<img src="demo/demo.jpeg" width="25%" style="border: 1px solid #ddd; border-radius: 4px;">
+<img src="demo/demo.jpg" width="30%">
 
 ---
 
