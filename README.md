@@ -2,6 +2,8 @@
 
 A Slack-to-AI gateway that lets you interact with Claude/Codex directly from your DMs.
 
+![RelayBot Demo](demo/demo.jpeg)
+
 ---
 
 ## What is RelayBot?

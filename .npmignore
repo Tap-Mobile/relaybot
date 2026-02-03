@@ -13,6 +13,7 @@ node_modules
 # Logs
 *.log
 output/
+demo/
 
 # OS files
 .DS_Store
