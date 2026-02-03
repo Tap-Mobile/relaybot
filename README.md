@@ -93,21 +93,37 @@ RelayBot acts as a bridge between Slack and AI coding agents, allowing you to in
 
 ## Installation
 
+### Option 1: Install via npm (Recommended)
+
 ```bash
-npm install -g slack-relaybot
+npm install -g relaybot
 ```
 
-## Quick Start
+Then run:
 
 ```bash
-# 1. Run setup to configure Slack credentials
-relaybot-setup
+# Configure Slack credentials
+relaybot setup
 
-# 2. Start the bot with Claude
-relaybot
+# Start the bot
+relaybot start
+```
 
-# Or start with Codex
-relaybot --codex
+### Option 2: Run from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/dinhquan/relaybot.git
+cd relaybot
+
+# Install dependencies
+npm install
+
+# Configure Slack credentials
+npm run setup
+
+# Start the bot
+npm start
 ```
 
 ---
@@ -121,7 +137,11 @@ Before running the bot, you need to configure your Slack credentials.
 Run the setup command and follow the prompts:
 
 ```bash
-relaybot-setup
+# If installed globally
+relaybot setup
+
+# If running from source
+npm run setup
 ```
 
 You will be asked for:
