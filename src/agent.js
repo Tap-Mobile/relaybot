@@ -8,8 +8,11 @@ const shell = useCodex ? 'codex' : 'claude';
 function sendCommand(text) {
   if (claudeProcess) {
     setTimeout(() => {
-      claudeProcess.write(text + '\r\n');
-      claudeProcess.write('\x0D');
+      claudeProcess.write(text + '\r');
+      setTimeout(() => {
+        claudeProcess.write('\r');
+        claudeProcess.write('\x0D');
+      }, 500);
     }, 500);
   }
 }
@@ -30,6 +33,16 @@ function start() {
   });
 
   console.log(`--- Persistent ${useCodex ? 'Codex' : 'Claude'} Session Started ---`);
+
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(true);
+  }
+  process.stdin.resume();
+  process.stdin.on('data', (data) => {
+    if (claudeProcess) {
+      claudeProcess.write(data);
+    }
+  });
 
   claudeProcess.onData((data) => {
     const dataStr = data.toString();
