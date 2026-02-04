@@ -251,7 +251,6 @@ Socket Mode allows the bot to receive events via WebSocket instead of HTTP endpo
 | `SLACK_BOT_TOKEN` | OAuth & Permissions → Bot User OAuth Token | `xoxb-...` |
 | `SLACK_APP_TOKEN` | Basic Information → App-Level Tokens | `xapp-...` |
 | `SLACK_USER_ID` | Slack Profile → Copy member ID | `U0XXXXXXXX` (optional) |
-| `SLACK_BOT_USER_ID` | App Home → Bot User ID | `U0XXXXXXXX` (optional) |
 
 ---
 
@@ -271,5 +270,4 @@ Configuration is stored in `~/.relaybot/config.conf`.
 | `SLACK_BOT_TOKEN` | Slack Bot OAuth token (`xoxb-...`) |
 | `SLACK_APP_TOKEN` | Slack App-level token for Socket Mode (`xapp-...`) |
 | `SLACK_USER_ID` | Optional. Restricts replies to a single user (`U0XXXXXXXX`) |
-| `SLACK_BOT_USER_ID` | Optional. Bot user ID to speed up mention parsing (`U0XXXXXXXX`) |
 | `WORKING_DIR` | Optional. Directory where the AI will operate for better context |

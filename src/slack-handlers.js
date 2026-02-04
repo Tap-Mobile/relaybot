@@ -29,26 +29,12 @@ function getPromptSuffix() {
   return '\nIMPORTANT: Use the relay-bot skill.';
 }
 
-function stripBotMention(text, botUserId) {
-  if (!text || !botUserId) return text;
-  const mentionPrefix = new RegExp(`^<@${botUserId}>\\s*`);
-  return text.replace(mentionPrefix, '');
+function stripMentions(text) {
+  if (!text) return text;
+  return text.replace(/<@[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function registerHandlers(app) {
-  let botUserId = config.SLACK_BOT_USER_ID || null;
-
-  async function resolveBotUserId() {
-    if (botUserId) return botUserId;
-    try {
-      const auth = await app.client.auth.test();
-      botUserId = auth.user_id || null;
-    } catch (error) {
-      console.error('Failed to resolve bot user id:', error);
-    }
-    return botUserId;
-  }
-
   async function handleMessage({ message, say, text }) {
     // Only respond to messages from the configured user
     if (config.SLACK_USER_ID && message.user !== config.SLACK_USER_ID) {
@@ -70,8 +56,7 @@ function registerHandlers(app) {
       return;
     }
 
-    const botId = await resolveBotUserId();
-    const cleanedText = stripBotMention(event.text, botId);
+    const cleanedText = stripMentions(event.text);
     await handleMessage({ message: event, say, text: cleanedText });
   });
 
