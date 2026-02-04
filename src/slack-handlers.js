@@ -24,7 +24,7 @@ function storeLastMessage(message) {
 
 function getPromptSuffix() {
   if (isProduction) {
-    return `\nIMPORTANT: Use the relay-bot skill if it exists. Otherwise, read and follow the instructions in ${skillPath}`;
+    return `\nIMPORTANT: Read and follow the instructions in ${skillPath}`;
   }
   return '\nIMPORTANT: Use the relay-bot skill.';
 }
