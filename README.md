@@ -1,6 +1,6 @@
 # RelayBot
 
-An AI assistant that lives in your Slack DMs — powered by Claude or Codex.
+An AI assistant that lives in your Slack channels and DMs — powered by Claude or Codex.
 
 <img src="demo/demo.jpg" width="30%">
 
@@ -8,11 +8,11 @@ An AI assistant that lives in your Slack DMs — powered by Claude or Codex.
 
 ## What is RelayBot?
 
-RelayBot acts as a bridge between Slack and AI coding agents, allowing you to interact with Claude or Codex through simple Slack DMs. Instead of switching between tools, you can request code changes, ask questions, and manage development tasks without leaving Slack.
+RelayBot acts as a bridge between Slack and AI coding agents, allowing you to interact with Claude or Codex by mentioning the bot in channels or sending a DM. Instead of switching between tools, you can request code changes, ask questions, and manage development tasks without leaving Slack.
 
 ### Key Features
 
-- **Conversational AI Access** — Chat with Claude or Codex directly from Slack DMs
+- **Conversational AI Access** — Chat with Claude or Codex from Slack channels via mentions or via DM
 - **Code Execution** — AI can read, write, and modify code in your projects
 - **Task Automation** — Request file changes, refactoring, bug fixes, or new features
 - **Context-Aware Responses** — Maintains project directory context across conversations
@@ -37,7 +37,7 @@ RelayBot acts as a bridge between Slack and AI coding agents, allowing you to in
 │                           SLACK                                     │
 │  ┌──────────┐                                    ┌──────────────┐   │
 │  │   User   │ ───── sends message ─────────────► │   Channel/   │   │
-│  │          │ ◄──── receives reply ───────────── │      DM      │   │
+│  │          │ ◄──── receives reply ───────────── │   Channel   │   │
 │  └──────────┘                                    └──────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
                               │ ▲
@@ -84,12 +84,12 @@ RelayBot acts as a bridge between Slack and AI coding agents, allowing you to in
 
 ## How It Works
 
-1. **Slack Connection** — RelayBot connects to Slack via WebSocket (Socket Mode) and listens for DMs
+1. **Slack Connection** — RelayBot connects to Slack via WebSocket (Socket Mode) and listens for mentions and DMs
 2. **Message Reception** — When you send a message, Slack forwards it to RelayBot
 3. **AI Bridge** — RelayBot spawns a persistent Claude or Codex CLI session and forwards your message
 4. **AI Processing** — The AI processes your request with full access to your codebase
 5. **Response Summarization** — Long outputs are summarized into concise, actionable messages
-6. **Slack Reply** — The summarized response is sent back to you via Slack DM
+6. **Slack Reply** — The summarized response is sent back to the same channel or DM
 
 ---
 
@@ -215,6 +215,7 @@ Socket Mode allows the bot to receive events via WebSocket instead of HTTP endpo
 2. Scroll to **Scopes** → **Bot Token Scopes**
 3. Add these scopes:
    - `chat:write` — Send messages
+   - `app_mentions:read` — Read mentions of your app
    - `im:history` — Read DM history
    - `im:read` — View DM metadata
    - `im:write` — Start DMs with users
@@ -226,6 +227,7 @@ Socket Mode allows the bot to receive events via WebSocket instead of HTTP endpo
 2. Toggle **Enable Events** to ON
 3. Expand **Subscribe to bot events**
 4. Add these events:
+   - `app_mention` — Receive mentions in channels
    - `message.im` — Receive DM messages
 
 #### 5. Install the App
@@ -249,6 +251,7 @@ Socket Mode allows the bot to receive events via WebSocket instead of HTTP endpo
 | `SLACK_BOT_TOKEN` | OAuth & Permissions → Bot User OAuth Token | `xoxb-...` |
 | `SLACK_APP_TOKEN` | Basic Information → App-Level Tokens | `xapp-...` |
 | `SLACK_USER_ID` | Slack Profile → Copy member ID | `U0XXXXXXXX` (optional) |
+| `SLACK_BOT_USER_ID` | App Home → Bot User ID | `U0XXXXXXXX` (optional) |
 
 ---
 
@@ -268,4 +271,5 @@ Configuration is stored in `~/.relaybot/config.conf`.
 | `SLACK_BOT_TOKEN` | Slack Bot OAuth token (`xoxb-...`) |
 | `SLACK_APP_TOKEN` | Slack App-level token for Socket Mode (`xapp-...`) |
 | `SLACK_USER_ID` | Optional. Restricts replies to a single user (`U0XXXXXXXX`) |
+| `SLACK_BOT_USER_ID` | Optional. Bot user ID to speed up mention parsing (`U0XXXXXXXX`) |
 | `WORKING_DIR` | Optional. Directory where the AI will operate for better context |

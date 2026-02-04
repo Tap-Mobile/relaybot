@@ -29,8 +29,27 @@ function getPromptSuffix() {
   return '\nIMPORTANT: Use the relay-bot skill.';
 }
 
+function stripBotMention(text, botUserId) {
+  if (!text || !botUserId) return text;
+  const mentionPrefix = new RegExp(`^<@${botUserId}>\\s*`);
+  return text.replace(mentionPrefix, '');
+}
+
 function registerHandlers(app) {
-  app.message(async ({ message, say }) => {
+  let botUserId = config.SLACK_BOT_USER_ID || null;
+
+  async function resolveBotUserId() {
+    if (botUserId) return botUserId;
+    try {
+      const auth = await app.client.auth.test();
+      botUserId = auth.user_id || null;
+    } catch (error) {
+      console.error('Failed to resolve bot user id:', error);
+    }
+    return botUserId;
+  }
+
+  async function handleMessage({ message, say, text }) {
     // Only respond to messages from the configured user
     if (config.SLACK_USER_ID && message.user !== config.SLACK_USER_ID) {
       return;
@@ -39,11 +58,29 @@ function registerHandlers(app) {
     storeLastMessage(message);
 
     if (agent.isRunning()) {
-      const fullPrompt = message.text + getPromptSuffix();
+      const fullPrompt = text + getPromptSuffix();
       agent.sendCommand(fullPrompt);
     } else {
       await say('Agent process is not running.');
     }
+  }
+
+  app.event('app_mention', async ({ event, say }) => {
+    if (event.channel_type === 'im' || event.channel_type === 'mpim') {
+      return;
+    }
+
+    const botId = await resolveBotUserId();
+    const cleanedText = stripBotMention(event.text, botId);
+    await handleMessage({ message: event, say, text: cleanedText });
+  });
+
+  app.message(async ({ message, say }) => {
+    if (message.channel_type !== 'im') {
+      return;
+    }
+
+    await handleMessage({ message, say, text: message.text });
   });
 }
 

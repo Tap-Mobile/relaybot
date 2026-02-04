@@ -1,7 +1,7 @@
 {
   "display_information": {
     "name": "RelayBot",
-    "description": "An AI assistant that lives in your Slack DMs — powered by Claude or Codex",
+    "description": "An AI assistant that lives in your Slack channels and DMs — powered by Claude or Codex",
     "background_color": "#4A154B"
   },
   "features": {
@@ -14,6 +14,7 @@
     "scopes": {
       "bot": [
         "chat:write",
+        "app_mentions:read",
         "im:history",
         "im:read",
         "im:write",
@@ -24,6 +25,7 @@
   "settings": {
     "event_subscriptions": {
       "bot_events": [
+        "app_mention",
         "message.im"
       ]
     },
