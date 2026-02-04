@@ -34,11 +34,22 @@ function start() {
 
   console.log(`--- Persistent ${useCodex ? 'Codex' : 'Claude'} Session Started ---`);
 
+  const hadRawMode = Boolean(process.stdin.isTTY && process.stdin.isRaw);
   if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
   }
   process.stdin.resume();
   process.stdin.on('data', (data) => {
+    if (data && data.length === 1 && data[0] === 3) {
+      // Ctrl+C: restore terminal and exit.
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(Boolean(hadRawMode));
+      }
+      if (claudeProcess) {
+        claudeProcess.kill('SIGINT');
+      }
+      process.exit(0);
+    }
     if (claudeProcess) {
       claudeProcess.write(data);
     }

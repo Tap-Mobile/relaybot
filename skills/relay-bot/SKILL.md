@@ -44,6 +44,8 @@ node ./src/send-slack-message.js "Your message here"
 - Keep messages concise and actionable
 - Include relevant links (PR URLs, documentation, etc.)
 - For long answers, summarize key points
+- Format replies with clean, readable line breaks; do not use literal `\n` sequences
+- Use emojis sparingly when they improve clarity or tone
 
 ## Notes
 
