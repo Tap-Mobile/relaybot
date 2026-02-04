@@ -1,9 +1,14 @@
 const pty = require('@lydell/node-pty');
 
 let claudeProcess = null;
-const useCodex = process.argv.includes('--codex');
-const noYolo = process.argv.includes('--noyolo');
-const shell = useCodex ? 'codex' : 'claude';
+let startTime = null;
+let lastExit = null;
+let stdinHandler = null;
+let stdinAttached = false;
+let rawModeBefore = null;
+let useCodex = process.argv.includes('--codex');
+let noYolo = process.argv.includes('--noyolo');
+let shell = useCodex ? 'codex' : 'claude';
 
 function sendCommand(text) {
   if (claudeProcess) {
@@ -21,7 +26,58 @@ function isRunning() {
   return claudeProcess !== null;
 }
 
-function start() {
+function attachStdin() {
+  if (stdinAttached) return;
+
+  rawModeBefore = Boolean(process.stdin.isTTY && process.stdin.isRaw);
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(true);
+  }
+  process.stdin.resume();
+
+  stdinHandler = (data) => {
+    if (data && data.length === 1 && data[0] === 3) {
+      // Ctrl+C: restore terminal and exit.
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(Boolean(rawModeBefore));
+      }
+      if (claudeProcess) {
+        claudeProcess.kill('SIGINT');
+      }
+      process.exit(0);
+    }
+    if (claudeProcess) {
+      claudeProcess.write(data);
+    }
+  };
+
+  process.stdin.on('data', stdinHandler);
+  stdinAttached = true;
+}
+
+function detachStdin() {
+  if (!stdinAttached) return;
+  process.stdin.off('data', stdinHandler);
+  stdinHandler = null;
+  stdinAttached = false;
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(Boolean(rawModeBefore));
+  }
+}
+
+function start(options = {}) {
+  if (claudeProcess) {
+    return claudeProcess;
+  }
+
+  if (typeof options.useCodex === 'boolean') {
+    useCodex = options.useCodex;
+  }
+  if (typeof options.noYolo === 'boolean') {
+    noYolo = options.noYolo;
+  }
+  shell = useCodex ? 'codex' : 'claude';
+
   const defaultArgs = useCodex ? ['--yolo'] : ['--dangerously-skip-permissions'];
   const spawnArgs = noYolo ? [] : defaultArgs;
   claudeProcess = pty.spawn(shell, spawnArgs, {
@@ -33,27 +89,9 @@ function start() {
   });
 
   console.log(`--- Persistent ${useCodex ? 'Codex' : 'Claude'} Session Started ---`);
+  startTime = new Date();
 
-  const hadRawMode = Boolean(process.stdin.isTTY && process.stdin.isRaw);
-  if (process.stdin.isTTY) {
-    process.stdin.setRawMode(true);
-  }
-  process.stdin.resume();
-  process.stdin.on('data', (data) => {
-    if (data && data.length === 1 && data[0] === 3) {
-      // Ctrl+C: restore terminal and exit.
-      if (process.stdin.isTTY) {
-        process.stdin.setRawMode(Boolean(hadRawMode));
-      }
-      if (claudeProcess) {
-        claudeProcess.kill('SIGINT');
-      }
-      process.exit(0);
-    }
-    if (claudeProcess) {
-      claudeProcess.write(data);
-    }
-  });
+  attachStdin();
 
   claudeProcess.onData((data) => {
     const dataStr = data.toString();
@@ -76,11 +114,59 @@ function start() {
     process.stdout.write(data);
   });
 
+  claudeProcess.onExit(({ exitCode, signal }) => {
+    lastExit = {
+      exitCode,
+      signal,
+      at: new Date()
+    };
+    claudeProcess = null;
+    startTime = null;
+    detachStdin();
+  });
+
   return claudeProcess;
+}
+
+function stop() {
+  if (!claudeProcess) {
+    return { stopped: false, reason: 'not_running' };
+  }
+
+  try {
+    claudeProcess.write('\x03');
+    setTimeout(() => {
+      if (claudeProcess) {
+        claudeProcess.kill('SIGINT');
+      }
+    }, 250);
+  } catch (error) {
+    return { stopped: false, reason: 'error', error };
+  }
+
+  return { stopped: true };
+}
+
+function getStatus() {
+  const now = Date.now();
+  const uptimeSeconds = startTime ? Math.floor((now - startTime.getTime()) / 1000) : null;
+  return {
+    running: Boolean(claudeProcess),
+    shell,
+    pid: claudeProcess ? claudeProcess.pid : null,
+    startedAt: startTime ? startTime.toISOString() : null,
+    uptimeSeconds,
+    noYolo,
+    useCodex,
+    cwd: process.cwd(),
+    lastExit
+  };
 }
 
 module.exports = {
   sendCommand,
   isRunning,
-  start
+  start,
+  stop,
+  getStatus
 };

@@ -93,6 +93,26 @@ RelayBot acts as a bridge between Slack and AI coding agents, allowing you to in
 
 ---
 
+## Slack Commands
+
+Send these as a DM to the bot (or in a channel mention) to control the agent session:
+
+- `$status` — Show whether the agent is running, plus PID, start time, uptime, cwd, WORKING_DIR, and last exit
+- `$stop` — Stop the agent session (equivalent to Ctrl-C)
+- `$start [--codex] [--noyolo]` — Start the agent with optional flags
+- `$restart [--codex] [--noyolo]` — Restart the agent with optional flags
+
+Examples:
+
+```
+$status
+$stop
+$start --codex
+$restart --noyolo
+```
+
+---
+
 ## Installation
 
 ### Option 1: Install via npm (Recommended)

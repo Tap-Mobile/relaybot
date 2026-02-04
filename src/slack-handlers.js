@@ -34,6 +34,19 @@ function stripMentions(text) {
   return text.replace(/<@[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 }
 
+function parseCommandOptions(text) {
+  const parts = (text || '').trim().split(/\s+/);
+  const options = {
+    useCodex: parts.includes('--codex'),
+    noYolo: parts.includes('--noyolo')
+  };
+  return options;
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function registerHandlers(app) {
   async function handleMessage({ message, say, text }) {
     // Only respond to messages from the configured user
@@ -43,8 +56,63 @@ function registerHandlers(app) {
 
     storeLastMessage(message);
 
+    const trimmedText = (text || '').trim();
+    if (trimmedText === '$stop') {
+      const result = agent.stop();
+      if (result.stopped) {
+        await say('Stopped the agent session (SIGINT).');
+      } else if (result.reason === 'not_running') {
+        await say('Agent is not running.');
+      } else {
+        await say('Failed to stop the agent session.');
+      }
+      return;
+    }
+
+    if (trimmedText.startsWith('$start')) {
+      const options = parseCommandOptions(trimmedText);
+      if (agent.isRunning()) {
+        await say('Agent is already running.');
+      } else {
+        agent.start(options);
+        await say(`Started the agent session${options.useCodex ? ' (Codex)' : ' (Claude)'}${options.noYolo ? ' without auto-approve flags' : ''}.`);
+      }
+      return;
+    }
+
+    if (trimmedText.startsWith('$restart')) {
+      const options = parseCommandOptions(trimmedText);
+      if (agent.isRunning()) {
+        agent.stop();
+        await delay(400);
+      }
+      agent.start(options);
+      await say(`Restarted the agent session${options.useCodex ? ' (Codex)' : ' (Claude)'}${options.noYolo ? ' without auto-approve flags' : ''}.`);
+      return;
+    }
+
+    if (trimmedText === '$status') {
+      const status = agent.getStatus();
+      const lines = [
+        `Running: ${status.running}`,
+        `Shell: ${status.shell}`,
+        `PID: ${status.pid || 'n/a'}`,
+        `Started: ${status.startedAt || 'n/a'}`,
+        `Uptime (s): ${status.uptimeSeconds || 'n/a'}`,
+        `CWD: ${status.cwd}`,
+        `Configured WORKING_DIR: ${config.WORKING_DIR || 'n/a'}`,
+        `Use Codex: ${status.useCodex}`,
+        `No YOLO: ${status.noYolo}`
+      ];
+      if (status.lastExit) {
+        lines.push(`Last exit: code=${status.lastExit.exitCode ?? 'n/a'} signal=${status.lastExit.signal || 'n/a'} at=${status.lastExit.at.toISOString()}`);
+      }
+      await say(lines.join('\n'));
+      return;
+    }
+
     if (agent.isRunning()) {
-      const fullPrompt = text + getPromptSuffix();
+      const fullPrompt = trimmedText + getPromptSuffix();
       agent.sendCommand(fullPrompt);
     } else {
       await say('Agent process is not running.');
