@@ -21,7 +21,7 @@ WORKING_DIR=/path/to/directory
 
 ### 1) Resolve project context
 
-- Use the directory configured in `WORKING_DIR` as the working context.
+- Use the directory configured in `WORKING_DIR` as the working context when set; otherwise use the current process working directory.
 - Run all commands and file operations within this directory.
 - Avoid asking the user for clarification; pick the best default and proceed automatically.
 - If a question is truly required to continue, send it as a Slack DM using the script, then wait for the user's response via the Slack socket before proceeding.

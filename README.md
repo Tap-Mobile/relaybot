@@ -163,8 +163,8 @@ npm run setup
 You will be asked for:
 - **SLACK_BOT_TOKEN** - Bot User OAuth Token (starts with `xoxb-`)
 - **SLACK_APP_TOKEN** - App-Level Token (starts with `xapp-`)
-- **SLACK_USER_ID** - Your Slack User ID (starts with `U`)
-- **WORKING_DIR** - Directory where the AI will operate
+- **SLACK_USER_ID** (optional) - Your Slack User ID (starts with `U`). Provide this to prevent the bot from replying to other users.
+- **WORKING_DIR** (optional) - Directory where the AI will operate. Set this to give the bot better context about where to work.
 
 ### Manual Setup
 
@@ -248,7 +248,7 @@ Socket Mode allows the bot to receive events via WebSocket instead of HTTP endpo
 |-------|---------------|--------|
 | `SLACK_BOT_TOKEN` | OAuth & Permissions → Bot User OAuth Token | `xoxb-...` |
 | `SLACK_APP_TOKEN` | Basic Information → App-Level Tokens | `xapp-...` |
-| `SLACK_USER_ID` | Slack Profile → Copy member ID | `U0XXXXXXXX` |
+| `SLACK_USER_ID` | Slack Profile → Copy member ID | `U0XXXXXXXX` (optional) |
 
 ---
 
@@ -267,5 +267,5 @@ Configuration is stored in `~/.relaybot/config.conf`.
 |----------|-------------|
 | `SLACK_BOT_TOKEN` | Slack Bot OAuth token (`xoxb-...`) |
 | `SLACK_APP_TOKEN` | Slack App-level token for Socket Mode (`xapp-...`) |
-| `SLACK_USER_ID` | Your Slack User ID (`U0XXXXXXXX`) |
-| `WORKING_DIR` | Directory where the AI will operate |
+| `SLACK_USER_ID` | Optional. Restricts replies to a single user (`U0XXXXXXXX`) |
+| `WORKING_DIR` | Optional. Directory where the AI will operate for better context |

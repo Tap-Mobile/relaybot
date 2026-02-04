@@ -1,4 +1,6 @@
 SLACK_BOT_TOKEN=xoxb-your-bot-token
 SLACK_APP_TOKEN=xapp-your-app-token
+# Optional: restricts replies to a single user
 SLACK_USER_ID=U0XXXXXXXX
+# Optional: sets working directory for better context
 WORKING_DIR=/path/to/directory

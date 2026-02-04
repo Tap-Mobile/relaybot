@@ -7,7 +7,7 @@ const slackHandlers = require('./src/slack-handlers');
 
 const config = loadConfig();
 
-if (!config || !config.SLACK_BOT_TOKEN || !config.SLACK_APP_TOKEN || !config.SLACK_USER_ID) {
+if (!config || !config.SLACK_BOT_TOKEN || !config.SLACK_APP_TOKEN) {
   console.error('❌ Configuration not found or incomplete.\n');
   console.log('Please run setup first:\n');
   console.log('  relaybot setup\n');

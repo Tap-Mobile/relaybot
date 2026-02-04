@@ -23,17 +23,23 @@ async function setup() {
 
   const botToken = await question('SLACK_BOT_TOKEN (xoxb-...): ');
   const appToken = await question('SLACK_APP_TOKEN (xapp-...): ');
-  const userId = await question('SLACK_USER_ID (U0XXXXXXXX): ');
+  const userId = await question('SLACK_USER_ID (optional, restricts replies) (U0XXXXXXXX): ');
 
   console.log('\nWorking directory (folder where the AI will operate).\n');
-  const workingDir = await question('WORKING_DIR: ');
+  const workingDir = await question('WORKING_DIR (optional): ');
 
   const configLines = [
     `SLACK_BOT_TOKEN=${botToken.trim()}`,
-    `SLACK_APP_TOKEN=${appToken.trim()}`,
-    `SLACK_USER_ID=${userId.trim()}`,
-    `WORKING_DIR=${workingDir.trim()}`
+    `SLACK_APP_TOKEN=${appToken.trim()}`
   ];
+
+  if (userId.trim()) {
+    configLines.push(`SLACK_USER_ID=${userId.trim()}`);
+  }
+
+  if (workingDir.trim()) {
+    configLines.push(`WORKING_DIR=${workingDir.trim()}`);
+  }
 
   // Create config directory if it doesn't exist
   if (!fs.existsSync(CONFIG_DIR)) {
