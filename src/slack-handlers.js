@@ -5,7 +5,7 @@ const loadConfig = require('./load-config');
 
 const config = loadConfig();
 const isProduction = __dirname.includes('node_modules');
-const skillPath = path.join(__dirname, '..', 'skills', 'relay-bot', 'SKILL.md');
+const skillPath = path.join(__dirname, '..', 'guide.md');
 const lastMessagePath = path.join(loadConfig.CONFIG_DIR, 'last_message.json');
 
 function storeLastMessage(message) {
@@ -23,10 +23,7 @@ function storeLastMessage(message) {
 }
 
 function getPromptSuffix() {
-  if (isProduction) {
-    return `\nIMPORTANT: Read and follow the instructions in ${skillPath}`;
-  }
-  return '\nIMPORTANT: Use the relay-bot skill.';
+  return `\nIMPORTANT: Read and follow the instructions in ${skillPath}`;
 }
 
 function stripMentions(text) {
