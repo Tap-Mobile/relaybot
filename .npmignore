@@ -6,8 +6,6 @@ config.conf
 .gitignore
 
 # Development
-.claude
-.codex
 node_modules
 
 # Logs
