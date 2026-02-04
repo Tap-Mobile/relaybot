@@ -15,11 +15,13 @@ Commands:
 
 Options:
   --codex  Use Codex instead of Claude (for start command)
+  --noyolo Skip --yolo / --dangerously-skip-permissions
 
 Examples:
   relaybot setup          # Run interactive setup
   relaybot start          # Start with Claude (default)
   relaybot start --codex  # Start with Codex
+  relaybot start --noyolo # Start without auto-approve flags
 `);
 }
 

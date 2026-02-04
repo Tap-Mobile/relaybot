@@ -2,6 +2,7 @@ const pty = require('@lydell/node-pty');
 
 let claudeProcess = null;
 const useCodex = process.argv.includes('--codex');
+const noYolo = process.argv.includes('--noyolo');
 const shell = useCodex ? 'codex' : 'claude';
 
 function sendCommand(text) {
@@ -18,7 +19,9 @@ function isRunning() {
 }
 
 function start() {
-  claudeProcess = pty.spawn(shell, useCodex ? ['--yolo'] : ['--dangerously-skip-permissions'], {
+  const defaultArgs = useCodex ? ['--yolo'] : ['--dangerously-skip-permissions'];
+  const spawnArgs = noYolo ? [] : defaultArgs;
+  claudeProcess = pty.spawn(shell, spawnArgs, {
     name: 'xterm-color',
     cols: 80,
     rows: 30,

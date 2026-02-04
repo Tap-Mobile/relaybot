@@ -112,6 +112,9 @@ relaybot start
 
 # Start the bot with Codex
 relaybot start --codex
+
+# Start the bot without auto-approve flags
+relaybot start --noyolo
 ```
 
 ### Option 2: Run from Source
@@ -132,6 +135,11 @@ npm start
 
 # Start the bot with Codex
 node main.js --codex
+
+# Start the bot without auto-approve flags
+node main.js --noyolo
+
+`--noyolo` disables passing `--yolo` (Codex) or `--dangerously-skip-permissions` (Claude) to the underlying CLI.
 ```
 
 ---
