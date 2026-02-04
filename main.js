@@ -20,6 +20,14 @@ const app = new App({
   socketMode: true
 });
 
+if (config.WORKING_DIR) {
+  try {
+    process.chdir(config.WORKING_DIR);
+  } catch (error) {
+    console.error(`Failed to change WORKING_DIR to ${config.WORKING_DIR}:`, error.message);
+  }
+}
+
 slackHandlers.registerHandlers(app);
 
 (async () => {

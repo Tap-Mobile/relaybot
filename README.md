@@ -101,6 +101,7 @@ Send these as a DM to the bot (or in a channel mention) to control the agent ses
 - `$stop` — Stop the agent session (equivalent to Ctrl-C)
 - `$start [--codex] [--noyolo]` — Start the agent with optional flags
 - `$restart [--codex] [--noyolo]` — Restart the agent with optional flags
+- `$dir /path/to/working/dir` — Update the configured working directory (must exist).
 
 Examples:
 
@@ -109,6 +110,7 @@ $status
 $stop
 $start --codex
 $restart --noyolo
+$dir /Users/you/work/project
 ```
 
 ---

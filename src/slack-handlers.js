@@ -34,6 +34,34 @@ function stripMentions(text) {
   return text.replace(/<@[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 }
 
+function updateConfigValue(key, value) {
+  fs.mkdirSync(loadConfig.CONFIG_DIR, { recursive: true });
+  let lines = [];
+  if (fs.existsSync(loadConfig.CONFIG_PATH)) {
+    const content = fs.readFileSync(loadConfig.CONFIG_PATH, 'utf-8');
+    lines = content.split('\n');
+  }
+
+  let updated = false;
+  lines = lines.map((line) => {
+    if (line.trim().startsWith('#') || !line.includes('=')) {
+      return line;
+    }
+    const [k] = line.split('=');
+    if (k.trim() === key) {
+      updated = true;
+      return `${key}=${value}`;
+    }
+    return line;
+  });
+
+  if (!updated) {
+    lines.push(`${key}=${value}`);
+  }
+
+  fs.writeFileSync(loadConfig.CONFIG_PATH, lines.join('\n'));
+}
+
 function parseCommandOptions(text) {
   const parts = (text || '').trim().split(/\s+/);
   const options = {
@@ -108,6 +136,27 @@ function registerHandlers(app) {
         lines.push(`Last exit: code=${status.lastExit.exitCode ?? 'n/a'} signal=${status.lastExit.signal || 'n/a'} at=${status.lastExit.at.toISOString()}`);
       }
       await say(lines.join('\n'));
+      return;
+    }
+
+    if (trimmedText.startsWith('$dir ')) {
+      const newDir = trimmedText.replace(/^\$dir\s+/, '').trim();
+      if (!newDir) {
+        await say('Usage: $dir /path/to/working/dir');
+        return;
+      }
+      if (!fs.existsSync(newDir)) {
+        await say(`Directory does not exist: ${newDir}`);
+        return;
+      }
+      const stat = fs.statSync(newDir);
+      if (!stat.isDirectory()) {
+        await say(`Not a directory: ${newDir}`);
+        return;
+      }
+      updateConfigValue('WORKING_DIR', newDir);
+      config.WORKING_DIR = newDir;
+      await say(`Working directory set to: ${newDir}`);
       return;
     }
 
