@@ -17,7 +17,7 @@ function sendCommand(text) {
       setTimeout(() => {
         claudeProcess.write('\r');
         claudeProcess.write('\x0D');
-      }, 500);
+      }, 1000);
     }, 500);
   }
 }

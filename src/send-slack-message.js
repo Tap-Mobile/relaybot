@@ -13,19 +13,24 @@ if (!config || !config.SLACK_BOT_TOKEN) {
 const web = new WebClient(config.SLACK_BOT_TOKEN);
 const lastMessagePath = path.join(loadConfig.CONFIG_DIR, 'last_message.json');
 
-function getLastChannel() {
+function getLastChannelInfo() {
   try {
     if (!fs.existsSync(lastMessagePath)) {
       return null;
     }
     const payload = JSON.parse(fs.readFileSync(lastMessagePath, 'utf-8'));
-    return payload?.channel || null;
+    return {
+      channel: payload?.channel || null,
+      thread_ts: payload?.thread_ts || null
+    };
   } catch (error) {
     console.error('Failed to read last message:', error);
     return null;
   }
 }
-const channelId = getLastChannel() || config.SLACK_USER_ID;
+const channelInfo = getLastChannelInfo();
+const channelId = channelInfo?.channel || config.SLACK_USER_ID;
+const threadTs = channelInfo?.thread_ts || null;
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -97,12 +102,16 @@ function chunkMessage(text, maxLen) {
 
     const chunks = chunkMessage(message, 39000);
     for (const chunk of chunks) {
-      await web.chat.postMessage({
+      const messageOptions = {
         channel: channelId,
         text: chunk,
-      });
+      };
+      if (threadTs) {
+        messageOptions.thread_ts = threadTs;
+      }
+      await web.chat.postMessage(messageOptions);
     }
-    console.log(`Successfully sent ${chunks.length} message(s) to ${channelId}`);
+    console.log(`Successfully sent ${chunks.length} message(s) to ${channelId}${threadTs ? ' (in thread)' : ''}`);
   } catch (error) {
     const apiError = error?.data?.error ? ` (${error.data.error})` : '';
     console.error(`Error sending message: ${error}${apiError}`);

@@ -13,7 +13,8 @@ function storeLastMessage(message) {
     const payload = {
       channel: message.channel,
       user: message.user,
-      ts: message.ts
+      ts: message.ts,
+      thread_ts: message.thread_ts || message.ts
     };
     fs.mkdirSync(loadConfig.CONFIG_DIR, { recursive: true });
     fs.writeFileSync(lastMessagePath, JSON.stringify(payload));
@@ -81,15 +82,19 @@ function registerHandlers(app) {
 
     storeLastMessage(message);
 
+    // Prepare say function with thread_ts support
+    const threadTs = message.thread_ts || message.ts;
+    const sayInThread = (msg) => say({ text: msg, thread_ts: threadTs });
+
     const trimmedText = (text || '').trim();
     if (trimmedText === '$stop') {
       const result = agent.stop();
       if (result.stopped) {
-        await say('Stopped the agent session (SIGINT).');
+        await sayInThread('Stopped the agent session (SIGINT).');
       } else if (result.reason === 'not_running') {
-        await say('Agent is not running.');
+        await sayInThread('Agent is not running.');
       } else {
-        await say('Failed to stop the agent session.');
+        await sayInThread('Failed to stop the agent session.');
       }
       return;
     }
@@ -97,10 +102,10 @@ function registerHandlers(app) {
     if (trimmedText.startsWith('$start')) {
       const options = parseCommandOptions(trimmedText);
       if (agent.isRunning()) {
-        await say('Agent is already running.');
+        await sayInThread('Agent is already running.');
       } else {
         agent.start(options);
-        await say(`Started the agent session${options.useCodex ? ' (Codex)' : ' (Claude)'}${options.noYolo ? ' without auto-approve flags' : ''}.`);
+        await sayInThread(`Started the agent session${options.useCodex ? ' (Codex)' : ' (Claude)'}${options.noYolo ? ' without auto-approve flags' : ''}.`);
       }
       return;
     }
@@ -112,7 +117,7 @@ function registerHandlers(app) {
         await delay(400);
       }
       agent.start(options);
-      await say(`Restarted the agent session${options.useCodex ? ' (Codex)' : ' (Claude)'}${options.noYolo ? ' without auto-approve flags' : ''}.`);
+      await sayInThread(`Restarted the agent session${options.useCodex ? ' (Codex)' : ' (Claude)'}${options.noYolo ? ' without auto-approve flags' : ''}.`);
       return;
     }
 
@@ -132,28 +137,28 @@ function registerHandlers(app) {
       if (status.lastExit) {
         lines.push(`Last exit: code=${status.lastExit.exitCode ?? 'n/a'} signal=${status.lastExit.signal || 'n/a'} at=${status.lastExit.at.toISOString()}`);
       }
-      await say(lines.join('\n'));
+      await sayInThread(lines.join('\n'));
       return;
     }
 
     if (trimmedText.startsWith('$dir ')) {
       const newDir = trimmedText.replace(/^\$dir\s+/, '').trim();
       if (!newDir) {
-        await say('Usage: $dir /path/to/working/dir');
+        await sayInThread('Usage: $dir /path/to/working/dir');
         return;
       }
       if (!fs.existsSync(newDir)) {
-        await say(`Directory does not exist: ${newDir}`);
+        await sayInThread(`Directory does not exist: ${newDir}`);
         return;
       }
       const stat = fs.statSync(newDir);
       if (!stat.isDirectory()) {
-        await say(`Not a directory: ${newDir}`);
+        await sayInThread(`Not a directory: ${newDir}`);
         return;
       }
       updateConfigValue('WORKING_DIR', newDir);
       config.WORKING_DIR = newDir;
-      await say(`Working directory set to: ${newDir}`);
+      await sayInThread(`Working directory set to: ${newDir}`);
       return;
     }
 
@@ -161,7 +166,7 @@ function registerHandlers(app) {
       const fullPrompt = trimmedText + getPromptSuffix();
       agent.sendCommand(fullPrompt);
     } else {
-      await say('Agent process is not running.');
+      await sayInThread('Agent process is not running.');
     }
   }
 
