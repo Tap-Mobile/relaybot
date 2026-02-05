@@ -14,7 +14,7 @@ function storeLastMessage(message) {
       channel: message.channel,
       user: message.user,
       ts: message.ts,
-      thread_ts: message.thread_ts || message.ts
+      thread_ts: message.thread_ts || null
     };
     fs.mkdirSync(loadConfig.CONFIG_DIR, { recursive: true });
     fs.writeFileSync(lastMessagePath, JSON.stringify(payload));
@@ -82,9 +82,15 @@ function registerHandlers(app) {
 
     storeLastMessage(message);
 
-    // Prepare say function with thread_ts support
-    const threadTs = message.thread_ts || message.ts;
-    const sayInThread = (msg) => say({ text: msg, thread_ts: threadTs });
+    // Prepare say function with thread_ts support (only if message is in a thread)
+    const threadTs = message.thread_ts;
+    const sayInThread = (msg) => {
+      if (threadTs) {
+        return say({ text: msg, thread_ts: threadTs });
+      } else {
+        return say(msg);
+      }
+    };
 
     const trimmedText = (text || '').trim();
     if (trimmedText === '$stop') {
