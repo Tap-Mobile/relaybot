@@ -1,6 +1,6 @@
 {
   "name": "relaybot",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "An AI assistant that lives in your Slack DMs — powered by Claude or Codex",
   "main": "main.js",
   "bin": {
